@@ -1,9 +1,9 @@
-import { MiddlewareHandler } from "hono";
 import { eq } from "drizzle-orm";
+import { MiddlewareHandler } from "hono";
 import { apiKeys } from "../db/schema";
 import { AppVariables, CloudflareBindings } from "../types";
 
-export const userValidationMiddleware: MiddlewareHandler<{
+export const identityMiddleware: MiddlewareHandler<{
   Bindings: CloudflareBindings;
   Variables: AppVariables;
 }> = async (c, next) => {

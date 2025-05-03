@@ -1,12 +1,11 @@
 import { Hono } from "hono";
-import { authMiddleware } from "./middleware/auth";
+import { apiKeyMiddleware } from "./middleware/api-key.middleware";
+import { dbMiddleware } from "./middleware/db.middleware";
+import { identityMiddleware } from "./middleware/identity.middleware";
+import { openaiMiddleware } from "./middleware/openai.middleware";
 import botRouter from "./routes/bots";
 import messageRouter from "./routes/messages";
 import { AppVariables, CloudflareBindings } from "./types";
-import { apiKeyMiddleware } from "./middleware/apiKeyMiddleware";
-import { dbMiddleware } from "./middleware/dbMiddleware";
-import { openaiMiddleware } from "./middleware/openaiMiddleware";
-import { userValidationMiddleware } from "./middleware/userValidationMiddleware";
 
 // Create the main Hono app
 const app = new Hono<{
@@ -19,7 +18,7 @@ app.use(
   apiKeyMiddleware,
   dbMiddleware,
   openaiMiddleware,
-  userValidationMiddleware
+  identityMiddleware
 );
 
 app.route("/bots", botRouter);
