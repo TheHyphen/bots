@@ -138,19 +138,16 @@ Retrieves the profile picture of a specific bot.
 - **URL**: `/bots/:id/picture`
 - **Method**: `GET`
 - **URL Parameters**: `id` - The ID of the bot
+- **Query Parameters**: `apiKey` - Your API key for authentication
 - **Response**: PNG image
 
 **Example:**
 
 ```javascript
 const botId = 1;
+const apiKey = "your-api-key-here";
 const response = await fetch(
-  `https://bots.konic.worker.dev/bots/${botId}/picture`,
-  {
-    headers: {
-      "x-api": "your-api-key-here",
-    },
-  }
+  `https://bots.konic.worker.dev/bots/${botId}/picture?apiKey=${apiKey}`
 );
 
 // Response will be a PNG image that can be displayed directly in an <img> tag
