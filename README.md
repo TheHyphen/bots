@@ -32,7 +32,7 @@ Creates a new bot with a name, description, and auto-generated profile picture.
 **Example:**
 
 ```javascript
-const response = await fetch("https://your-api.com/bots", {
+const response = await fetch("https://bots.konic.worker.dev/bots", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
@@ -58,7 +58,7 @@ Retrieves all bots created by the authenticated user.
 **Example:**
 
 ```javascript
-const response = await fetch("https://your-api.com/bots", {
+const response = await fetch("https://bots.konic.worker.dev/bots", {
   headers: {
     "x-api": "your-api-key-here",
   },
@@ -94,7 +94,7 @@ Retrieves details about a specific bot, including its conversation history.
 
 ```javascript
 const botId = 1;
-const response = await fetch(`https://your-api.com/bots/${botId}`, {
+const response = await fetch(`https://bots.konic.worker.dev/bots/${botId}`, {
   headers: {
     "x-api": "your-api-key-here",
   },
@@ -144,11 +144,14 @@ Retrieves the profile picture of a specific bot.
 
 ```javascript
 const botId = 1;
-const response = await fetch(`https://your-api.com/bots/${botId}/picture`, {
-  headers: {
-    "x-api": "your-api-key-here",
-  },
-});
+const response = await fetch(
+  `https://bots.konic.worker.dev/bots/${botId}/picture`,
+  {
+    headers: {
+      "x-api": "your-api-key-here",
+    },
+  }
+);
 
 // Response will be a PNG image that can be displayed directly in an <img> tag
 const imageBlob = await response.blob();
@@ -174,16 +177,19 @@ Sends a message to a bot and receives a response.
 
 ```javascript
 const botId = 1;
-const response = await fetch(`https://your-api.com/bots/${botId}/messages`, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    "x-api": "your-api-key-here",
-  },
-  body: JSON.stringify({
-    message: "What services do you offer?",
-  }),
-});
+const response = await fetch(
+  `https://bots.konic.worker.dev/bots/${botId}/messages`,
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api": "your-api-key-here",
+    },
+    body: JSON.stringify({
+      message: "What services do you offer?",
+    }),
+  }
+);
 
 const data = await response.json();
 /* Response:
