@@ -68,7 +68,7 @@ app.post("/bots", zValidator("json", createBotSchema), async (c) => {
     .values({ name, description, userId, picture: response.image.base64 })
     .run();
 
-  return c.json({ message: "Bot created!", bot: result });
+  return c.json({ message: "Bot created!" });
 });
 
 app.get("/bots", async (c) => {
@@ -123,7 +123,10 @@ app.get("/bots/:id/picture", async (c) => {
   if (!bot) {
     return c.json({ error: "Bot not found" }, 404);
   }
-  return c.json({ picture: bot.picture });
+  // base64 response
+  c.res.headers.set("Content-Type", "image/png");
+  c.res.headers.set("Content-Disposition", "inline");
+  c.body(Buffer.from(bot.picture!, "base64"), 200);
 });
 
 app.post(
