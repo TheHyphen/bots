@@ -5,7 +5,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { bots } from "../db/schema";
 import { AppVariables, CloudflareBindings } from "../types";
-import { createBotSchema, getBotPictureUrl } from "../utils/botUtils";
+import { getBotPictureUrl } from "../utils/botUtils";
 
 // Create a Hono router for bot endpoints
 const botRouter = new Hono<{
@@ -13,6 +13,10 @@ const botRouter = new Hono<{
   Variables: AppVariables;
 }>();
 
+export const createBotSchema = z.object({
+  name: z.string().min(1, "Bot name is required"),
+  description: z.string().min(1, "Bot description is required"),
+});
 // Create a new bot
 botRouter.post("/", zValidator("json", createBotSchema), async (c) => {
   const db = c.get("db");

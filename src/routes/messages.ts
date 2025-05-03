@@ -2,9 +2,13 @@ import { zValidator } from "@hono/zod-validator";
 import { generateText } from "ai";
 import { and, eq } from "drizzle-orm";
 import { Hono } from "hono";
+import { z } from "zod";
 import { bots, messages } from "../db/schema";
 import { AppVariables, CloudflareBindings } from "../types";
-import { createMessageSchema } from "../utils/botUtils";
+
+export const createMessageSchema = z.object({
+  message: z.string().min(1, "Message content is required"),
+});
 
 const messageRouter = new Hono<{
   Bindings: CloudflareBindings;
