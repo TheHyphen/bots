@@ -25,7 +25,7 @@
     {
       "binding": "DB",
       "database_name": "Bots",
-      "database_id": "bots",
+      "database_id": "8c56884a-a978-47a5-8c12-cc7ca5cc0c5c",
       "migrations_dir": "migrations"
     }
   ]

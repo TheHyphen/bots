@@ -8,7 +8,7 @@ export const users = sqliteTable("users", {
   email: text("email").notNull().unique(),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`now()`),
+    .default(sql`(current_timestamp)`),
 });
 
 export const apiKeys = sqliteTable("api_keys", {
@@ -16,13 +16,13 @@ export const apiKeys = sqliteTable("api_keys", {
   key: text("key").notNull().unique(),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`now()`),
+    .default(sql`(current_timestamp)`),
   userId: integer("user_id")
     .notNull()
     .references(() => users.id),
   lastUsed: integer("last_used", { mode: "timestamp" })
     .notNull()
-    .default(sql`now()`),
+    .default(sql`(current_timestamp)`),
 });
 
 export const bots = sqliteTable("bots", {
@@ -31,7 +31,7 @@ export const bots = sqliteTable("bots", {
   description: text("description"),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`now()`),
+    .default(sql`(current_timestamp)`),
   userId: integer("user_id")
     .notNull()
     .references(() => users.id),
@@ -43,7 +43,7 @@ export const messages = sqliteTable("messages", {
   content: text("content").notNull(),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`now()`),
+    .default(sql`(current_timestamp)`),
   botId: integer("bot_id")
     .notNull()
     .references(() => bots.id),
