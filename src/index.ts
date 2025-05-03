@@ -47,7 +47,7 @@ app.use("*", async (c, next) => {
     return c.json({ error: "User not found" }, 404);
   }
   c.set("userId", user.id);
-  next();
+  return next();
 });
 
 app.post("/bots", zValidator("json", createBotSchema), async (c) => {
