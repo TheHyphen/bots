@@ -26,12 +26,12 @@
       "database_id": "8c56884a-a978-47a5-8c12-cc7ca5cc0c5c",
       "migrations_dir": "migrations"
     }
-  ]
+  ],
   // "ai": {
   //   "binding": "AI"
   // },
-  // "observability": {
-  //   "enabled": true,
-  //   "head_sampling_rate": 1
-  // }
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  }
 }
