@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { blob, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 // Example table for users
 export const users = sqliteTable("users", {
@@ -35,7 +35,7 @@ export const bots = sqliteTable("bots", {
   userId: integer("user_id")
     .notNull()
     .references(() => users.id),
-  picture: text("picture"),
+  picture: blob("picture"),
 });
 
 export const messages = sqliteTable("messages", {
