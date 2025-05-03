@@ -109,24 +109,7 @@ const data = await response.json();
     "description": "A helpful bot that assists customers with their inquiries.",
     "userId": 1,
     "createdAt": "2023-06-15T10:30:00Z"
-  },
-  "messages": [
-    {
-      "id": 1,
-      "content": "Hello, how can I help you today?",
-      "createdAt": "2023-06-15T10:35:00Z",
-      "botId": 1,
-      "role": "assistant"
-    },
-    {
-      "id": 2,
-      "content": "I need help with my order.",
-      "createdAt": "2023-06-15T10:36:00Z",
-      "botId": 1,
-      "role": "user"
-    }
-    // more messages...
-  ]
+  }
 }
 */
 ```
@@ -192,6 +175,50 @@ const data = await response.json();
 /* Response:
 {
   "message": "We offer a variety of services including customer support, product recommendations, and general assistance. How can I help you specifically today?"
+}
+*/
+```
+
+#### 6. Get Messages of a Bot
+
+Sends a message to a bot and receives a response.
+
+- **URL**: `/bots/:id/messages`
+- **Method**: `GET`
+
+**Example:**
+
+```javascript
+const botId = 1;
+const response = await fetch(
+  `https://bots.konic.worker.dev/bots/${botId}/messages`,
+  {
+    headers: {
+      "Content-Type": "application/json",
+      "x-api": "your-api-key-here",
+    },
+  }
+);
+
+const data = await response.json();
+/* Response:
+{
+  "messages": [
+    {
+      "id": 1,
+      "content": "Hey there, how are you?",
+      "createdAt": null,
+      "botId": 2,
+      "role": "user"
+    },
+    {
+      "id": 2,
+      "content": "Well, considering I'm a genius billionaire playboy philanthropist with a penchant for saving the world in a custom-built red and gold suit... I'd say I'm doing just fine. How about you? Need something built, hacked, or blown up—in that order?",
+      "createdAt": null,
+      "botId": 2,
+      "role": "assistant"
+    }
+  ]
 }
 */
 ```
