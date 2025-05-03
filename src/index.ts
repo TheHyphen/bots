@@ -87,7 +87,13 @@ app.get("/bots/:id", async (c) => {
   const userId = c.get("userId");
   const botId = parseInt(c.req.param("id"));
   const bot = await db
-    .select()
+    .select({
+      id: bots.id,
+      name: bots.name,
+      description: bots.description,
+      userId: bots.userId,
+      createdAt: bots.createdAt,
+    })
     .from(bots)
     .where(and(eq(bots.id, botId), eq(bots.userId, userId)))
     .get();
@@ -101,6 +107,23 @@ app.get("/bots/:id", async (c) => {
     .orderBy(messages.createdAt)
     .all();
   return c.json({ bot, messages: messagesList });
+});
+
+app.get("/bots/:id/picture", async (c) => {
+  const db = c.get("db");
+  const userId = c.get("userId");
+  const botId = parseInt(c.req.param("id"));
+  const bot = await db
+    .select({
+      picture: bots.picture,
+    })
+    .from(bots)
+    .where(and(eq(bots.id, botId), eq(bots.userId, userId)))
+    .get();
+  if (!bot) {
+    return c.json({ error: "Bot not found" }, 404);
+  }
+  return c.json({ picture: bot.picture });
 });
 
 app.post(
@@ -128,6 +151,7 @@ app.post(
       .all();
     const response = await generateText({
       model: openai("chatgpt-4o-latest"),
+      system: bot.description!,
       messages: [
         ...messagesList.map((message) => ({
           role: message.role as "user" | "assistant",
