@@ -1,14 +1,26 @@
 import { createOpenAI, OpenAIProvider } from "@ai-sdk/openai";
+import { zValidator } from "@hono/zod-validator";
 import { experimental_generateImage, generateText } from "ai";
 import { and, eq } from "drizzle-orm";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import { Hono } from "hono";
+import { z } from "zod";
 import { apiKeys, bots, messages } from "./db/schema";
 
 const app = new Hono<{
   Bindings: CloudflareBindings;
   Variables: { db: DrizzleD1Database; openai: OpenAIProvider; userId: number };
 }>();
+
+// Define validation schemas
+const createBotSchema = z.object({
+  name: z.string().min(1, "Bot name is required"),
+  description: z.string().min(1, "Bot description is required"),
+});
+
+const createMessageSchema = z.object({
+  message: z.string().min(1, "Message content is required"),
+});
 
 app.use("*", async (c, next) => {
   const apiHeader = c.req.header("x-api");
@@ -38,7 +50,7 @@ app.use("*", async (c, next) => {
   next();
 });
 
-app.post("/bots", async (c) => {
+app.post("/bots", zValidator("json", createBotSchema), async (c) => {
   const db = c.get("db");
   const openai = c.get("openai");
   const userId = c.get("userId");
@@ -91,56 +103,60 @@ app.get("/bots/:id", async (c) => {
   return c.json({ bot, messages: messagesList });
 });
 
-app.post("/bots/:id/messages", async (c) => {
-  const db = c.get("db");
-  const openai = c.get("openai");
-  const userId = c.get("userId");
-  const botId = parseInt(c.req.param("id"));
-  const { message } = await c.req.json();
-  const bot = await db
-    .select()
-    .from(bots)
-    .where(and(eq(bots.id, botId), eq(bots.userId, userId)))
-    .get();
-  if (!bot) {
-    return c.json({ error: "Bot not found" }, 404);
+app.post(
+  "/bots/:id/messages",
+  zValidator("json", createMessageSchema),
+  async (c) => {
+    const db = c.get("db");
+    const openai = c.get("openai");
+    const userId = c.get("userId");
+    const botId = parseInt(c.req.param("id"));
+    const { message } = await c.req.json();
+    const bot = await db
+      .select()
+      .from(bots)
+      .where(and(eq(bots.id, botId), eq(bots.userId, userId)))
+      .get();
+    if (!bot) {
+      return c.json({ error: "Bot not found" }, 404);
+    }
+    const messagesList = await db
+      .select()
+      .from(messages)
+      .where(eq(messages.botId, botId))
+      .orderBy(messages.createdAt)
+      .all();
+    const response = await generateText({
+      model: openai("chatgpt-4o-latest"),
+      messages: [
+        ...messagesList.map((message) => ({
+          role: message.role as "user" | "assistant",
+          content: message.content,
+        })),
+        { role: "user", content: message },
+      ],
+    });
+    if (!response) {
+      return c.json({ error: "Error generating response" }, 500);
+    }
+    await db
+      .insert(messages)
+      .values({
+        botId,
+        role: "user",
+        content: message,
+      })
+      .run();
+    await db
+      .insert(messages)
+      .values({
+        botId,
+        role: "assistant",
+        content: response.text,
+      })
+      .run();
+    return c.json({ message: response.text });
   }
-  const messagesList = await db
-    .select()
-    .from(messages)
-    .where(eq(messages.botId, botId))
-    .orderBy(messages.createdAt)
-    .all();
-  const response = await generateText({
-    model: openai("chatgpt-4o-latest"),
-    messages: [
-      ...messagesList.map((message) => ({
-        role: message.role as "user" | "assistant",
-        content: message.content,
-      })),
-      { role: "user", content: message },
-    ],
-  });
-  if (!response) {
-    return c.json({ error: "Error generating response" }, 500);
-  }
-  await db
-    .insert(messages)
-    .values({
-      botId,
-      role: "user",
-      content: message,
-    })
-    .run();
-  await db
-    .insert(messages)
-    .values({
-      botId,
-      role: "assistant",
-      content: response.text,
-    })
-    .run();
-  return c.json({ message: response.text });
-});
+);
 
 export default app;
